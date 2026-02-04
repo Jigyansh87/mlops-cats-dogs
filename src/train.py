@@ -70,3 +70,14 @@ history = model.fit(
 # Save model
 model.save(MODEL_PATH)
 print(f"Model saved to {MODEL_PATH}")
+import json
+
+metrics = {
+    "accuracy": float(history.history["accuracy"][-1]),
+    "val_accuracy": float(history.history["val_accuracy"][-1]),
+    "loss": float(history.history["loss"][-1]),
+    "val_loss": float(history.history["val_loss"][-1])
+}
+
+with open("metrics.json", "w") as f:
+    json.dump(metrics, f, indent=4)
