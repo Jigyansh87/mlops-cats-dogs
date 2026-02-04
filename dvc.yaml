@@ -6,3 +6,10 @@ stages:
     - src/preprocess.py
     outs:
     - data/processed
+  train:
+    cmd: python src/train.py
+    deps:
+    - data/processed
+    - src/train.py
+    outs:
+    - models/model.h5
