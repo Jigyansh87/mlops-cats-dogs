@@ -2,7 +2,7 @@ import os
 import shutil
 from sklearn.model_selection import train_test_split
 
-RAW_DIR = "data/raw/train"
+RAW_DIR = "data/raw/catsvsdogs/train"
 PROCESSED_DIR = "data/processed"
 TRAIN_DIR = os.path.join(PROCESSED_DIR, "train")
 VAL_DIR = os.path.join(PROCESSED_DIR, "val")
