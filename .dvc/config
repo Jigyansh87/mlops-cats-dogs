@@ -1,4 +1,6 @@
 [core]
     remote = storage
+[cache]
+    dir = /mnt/nvme/dvc-cache
 ['remote "storage"']
     url = C:/dvcstore
