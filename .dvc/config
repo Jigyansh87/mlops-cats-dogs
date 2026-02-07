@@ -4,4 +4,4 @@
 [cache]
     dir = /mnt/nvme/dvc-cache
 ['remote "storage"']
-    url = C:/dvcstore
+    url = https://github.com/Jigyansh87/mlops-cats-dogs-dvc.git
