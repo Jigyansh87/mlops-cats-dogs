@@ -4,4 +4,4 @@
 [cache]
     dir = /mnt/nvme/dvc-cache
 ['remote "storage"']
-    url = https://github.com/Jigyansh87/mlops-cats-dogs-dvc.git
+    url = https://huggingface.co/datasets/Jigyansh87/mlops-cats-dogs-data
