@@ -1,56 +1,65 @@
-from fastapi import FastAPI, File, UploadFile
-import tensorflow as tf
-from PIL import Image
+import os
 import numpy as np
+import tensorflow as tf
+from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import JSONResponse
+from PIL import Image
 import io
-import logging
 
-# -------------------
-# Logging
-# -------------------
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Initialize FastAPI app
+app = FastAPI(title="Cats vs Dogs Classifier API")
 
-# -------------------
-# App
-# -------------------
-app = FastAPI(title="Cats vs Dogs Classifier")
-
+# Load trained model
 MODEL_PATH = "models/model.h5"
+
+if not os.path.exists(MODEL_PATH):
+    raise RuntimeError(f"Model not found at {MODEL_PATH}")
+
 model = tf.keras.models.load_model(MODEL_PATH)
 
-IMG_SIZE = 128
+IMG_SIZE = (150, 150)
+CLASS_NAMES = ["cat", "dog"]
 
-# -------------------
-# Utils
-# -------------------
-def preprocess_image(image_bytes):
+
+def preprocess_image(image_bytes: bytes):
     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    image = image.resize((IMG_SIZE, IMG_SIZE))
-    img_array = np.array(image) / 255.0
-    img_array = np.expand_dims(img_array, axis=0)
-    return img_array
+    image = image.resize(IMG_SIZE)
+    image = np.array(image) / 255.0
+    image = np.expand_dims(image, axis=0)
+    return image
 
-# -------------------
-# Routes
-# -------------------
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+
+@app.get("/")
+def root():
+    return {"message": "Cats vs Dogs API is running"}
+
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    logger.info("Received prediction request")
+    try:
+        image_bytes = await file.read()
+        image = preprocess_image(image_bytes)
 
-    image_bytes = await file.read()
-    img = preprocess_image(image_bytes)
+        preds = model.predict(image)
+        confidence = float(preds[0][0])
 
-    prediction = model.predict(img)[0][0]
+        label = CLASS_NAMES[int(confidence > 0.5)]
 
-    label = "dog" if prediction > 0.5 else "cat"
-    confidence = float(prediction)
+        return JSONResponse(
+            content={
+                "prediction": label,
+                "confidence": confidence
+            }
+        )
 
-    return {
-        "prediction": label,
-        "confidence": confidence
-    }
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e)}
+        )
+
+
+# IMPORTANT: allows running via `python app.py`
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
