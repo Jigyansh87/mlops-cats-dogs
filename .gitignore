@@ -1,4 +1,19 @@
-venv/ 
-__pycache__/ 
-*.pyc 
-/metrics.json
+# Data
+data/raw/
+data/processed/
+
+# Models
+models/
+*.h5
+*.keras
+
+# MLflow
+mlruns/
+mlflow.db
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
